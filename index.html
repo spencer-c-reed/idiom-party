@@ -2,44 +2,159 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <meta name="theme-color" content="#ff5c35" />
   <title>Tip of the Tongue</title>
-  <style>
-    :root{font-family:Inter,ui-rounded,"SF Pro Rounded",system-ui,sans-serif;color:#251b18;background:#fff8e8;font-synthesis:none}*{box-sizing:border-box}body{margin:0;min-height:100dvh;background:radial-gradient(circle at 20% 0,#ffd65a 0,transparent 34%),linear-gradient(160deg,#fff7df,#ffdfd3);overflow-x:hidden}button,input{font:inherit}.app{max-width:540px;min-height:100dvh;margin:auto;padding:max(18px,env(safe-area-inset-top)) 18px max(22px,env(safe-area-inset-bottom));display:flex;flex-direction:column}.top{display:flex;justify-content:space-between;align-items:center;gap:12px}.brand{font-weight:1000;letter-spacing:-1.2px;font-size:23px}.pill{background:#fff;border:2px solid #251b18;border-radius:999px;padding:8px 12px;font-weight:900;box-shadow:2px 3px 0 #251b18}.screen{display:none;flex:1;flex-direction:column}.screen.active{display:flex}.hero{margin:auto 0;text-align:center}.burst{font-size:76px;filter:drop-shadow(4px 6px 0 rgba(37,27,24,.16));animation:bob 2s ease-in-out infinite}@keyframes bob{50%{transform:rotate(5deg) translateY(-6px)}}h1{font-size:48px;line-height:.9;letter-spacing:-3px;margin:12px 0;color:#ec3f25}h2{font-size:32px;letter-spacing:-1.5px;margin:22px 0 8px}.sub{font-size:18px;line-height:1.4;font-weight:650;opacity:.76}.btn{width:100%;border:3px solid #251b18;border-radius:18px;padding:17px 16px;font-weight:1000;font-size:19px;background:#fff;box-shadow:4px 5px 0 #251b18;cursor:pointer;margin-top:12px;transition:.08s}.btn:active{transform:translate(3px,4px);box-shadow:1px 1px 0 #251b18}.btn:disabled{cursor:not-allowed;opacity:.55;transform:none;box-shadow:1px 1px 0 #251b18}.primary{background:#ff5c35;color:#fff}.yellow{background:#ffd34e}.ghost{background:rgba(255,255,255,.55)}.setup{margin:auto 0}.field{margin:18px 0}.field label{display:block;font-weight:950;margin-bottom:8px}.field input{width:100%;border:3px solid #251b18;border-radius:14px;background:#fff;padding:14px;font-size:18px;font-weight:800}.seg{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.seg button{border:2px solid #251b18;background:#fff;border-radius:12px;padding:12px 5px;font-weight:900}.seg button.on{background:#ffd34e;box-shadow:2px 3px 0 #251b18}.scorebar{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px;margin:18px 0}.team{text-align:center;font-weight:950}.team.active-team{color:#ec3f25}.score{font-size:30px;display:block}.timer{width:68px;height:68px;border:4px solid #251b18;border-radius:50%;display:grid;place-items:center;background:#fff;font-size:25px;font-weight:1000;box-shadow:3px 4px 0 #251b18}.card{position:relative;background:#fff;border:4px solid #251b18;border-radius:26px;box-shadow:7px 8px 0 #251b18;padding:25px 22px;min-height:330px;display:flex;flex-direction:column;justify-content:center;text-align:center;margin:auto 0;overflow:hidden}.card:before{content:attr(data-mode);position:absolute;top:0;left:0;right:0;background:#ffd34e;border-bottom:3px solid #251b18;padding:10px;font-size:13px;font-weight:1000;letter-spacing:1.5px}.gib{font-weight:1000;font-size:35px;line-height:1.08;letter-spacing:-1px;text-transform:uppercase}.hint{font-size:14px;font-weight:850;opacity:.55;margin-top:18px}.answer{display:none;margin-top:24px;padding-top:20px;border-top:3px dashed #e6b9aa;font-size:25px;font-weight:1000;color:#ec3f25}.answer.show{display:block}.controls{margin-top:16px;display:grid;grid-template-columns:1fr 1.45fr;gap:10px}.controls .btn{margin:0}.tiny{text-align:center;font-size:13px;font-weight:750;opacity:.6;margin-top:13px}.winner{text-align:center;margin:auto 0}.winner .burst{font-size:90px}.rules{background:#fff;border:3px solid #251b18;border-radius:20px;padding:18px;text-align:left;margin:20px 0}.rules li{margin:10px 0;font-weight:700;line-height:1.3}@media(max-height:700px){.card{min-height:275px}.gib{font-size:30px}h1{font-size:42px}.burst{font-size:58px}}
-  @media(max-height:620px){.app{padding-top:8px;padding-bottom:8px}.top{min-height:34px}.brand{font-size:17px}.pill{padding:5px 9px}.scorebar{margin:7px 0}.timer{width:52px;height:52px;font-size:20px}.score{font-size:23px}.card{min-height:205px;padding:42px 16px 10px;border-radius:20px}.gib{font-size:24px}.hint{margin-top:8px}.answer{margin-top:10px;padding-top:9px;font-size:20px}.controls{margin-top:8px}.btn{padding:11px}.tiny{margin-top:5px}.screen#game>.ghost{margin-top:7px!important}}</style>
+  <link rel="stylesheet" href="styles.css" />
 </head>
-<body><main class="app">
-  <header class="top"><div class="brand">👅 TIP OF THE TONGUE</div><button id="sound" class="pill" aria-label="Toggle sound">🔊</button></header>
-  <section id="home" class="screen active"><div class="hero"><div class="burst">🤪</div><h1>Sounds wrong.<br>Feels right.</h1><p class="sub">Race through two kinds of warped sayings: Synonym Twists and Mixed Messages.</p><button class="btn primary" onclick="go('setup')">PLAY NOW</button><button class="btn ghost" onclick="go('how')">HOW TO PLAY</button></div></section>
-  <section id="how" class="screen"><div class="setup"><h2>How to play</h2><ol class="rules"><li>Split into two teams. On each turn, a reader from the opposing team holds the phone and keeps score.</li><li><b>Synonym Twist:</b> the saying is rebuilt with indirect substitutes. Example: “outer edge of your mouth muscle” means “tip of your tongue.”</li><li><b>Mixed Message:</b> a riddle-like description points to the whole saying. Both styles are mixed into one deck.</li><li>The reader says only what is shown. Only the active team guesses; close wording that clearly identifies the standard phrase counts.</li><li>Only the active team may guess. Tap <b>Got it!</b> for a point. You get two skips per turn; revealing an answer uses a skip and earns no point.</li><li>When time runs out, swap roles. Both teams always get the same number of turns; the higher score after reaching the target wins.</li></ol><button class="btn primary" onclick="go('setup')">LET'S PLAY</button><button class="btn ghost" onclick="go('home')">BACK</button></div></section>
-  <section id="setup" class="screen"><div class="setup"><h2>Set the table</h2><div class="field"><label>Team 1</label><input id="t1" value="Hot Dogs" maxlength="18"></div><div class="field"><label>Team 2</label><input id="t2" value="Cool Cats" maxlength="18"></div><div class="field"><label>Seconds per turn</label><div class="seg" id="times"><button class="on" data-v="30">30</button><button data-v="45">45</button><button data-v="60">60</button></div></div><div class="field"><label>Points to win</label><div class="seg" id="targets"><button data-v="7">7</button><button class="on" data-v="10">10</button><button data-v="15">15</button></div></div><button class="btn primary" onclick="startGame()">START GAME</button></div></section>
-  <section id="turn" class="screen"><div class="winner"><div class="burst">📣</div><h2 id="turnTitle"></h2><p class="sub">The other team chooses a reader.<br>They hold the phone and read your clues.</p><button class="btn yellow" onclick="startRound()">READY — START TIMER</button></div></section>
-  <section id="game" class="screen"><div class="scorebar"><div id="teamA" class="team"><span class="score" id="s1">0</span><span id="n1"></span></div><div class="timer" id="clock">45</div><div id="teamB" class="team"><span class="score" id="s2">0</span><span id="n2"></span></div></div><div class="card"><div class="gib" id="gib"></div><div class="hint">Which familiar saying does this mean?</div><div class="answer" id="answer"></div></div><div class="controls"><button id="skipBtn" class="btn ghost" onclick="skip()">SKIP (2)</button><button id="correctBtn" class="btn primary" onclick="correct()">GOT IT! ✓</button></div><button id="revealBtn" class="btn ghost" style="padding:10px;font-size:14px" onclick="reveal()">REVEAL + SKIP</button><div class="tiny">Reader: no extra hints — only read what’s shown!</div></section>
-  <section id="win" class="screen"><div class="winner"><div class="burst">🏆</div><h1 id="winTitle"></h1><p class="sub" id="finalScore"></p><button class="btn primary" onclick="rematch()">REMATCH</button><button class="btn ghost" onclick="go('setup')">NEW GAME</button></div></section>
-</main><script src="cards.js"></script><script>
+<body>
+<main class="app">
+  <header class="top">
+    <div class="brand"><span aria-hidden="true">👅</span> TIP OF THE TONGUE</div>
+    <button id="sound" class="pill" type="button" aria-label="Mute sounds" aria-pressed="true">
+      <span id="soundIcon" aria-hidden="true">🔊</span>
+    </button>
+  </header>
+
+  <section id="home" class="screen active" aria-labelledby="homeTitle" aria-hidden="false">
+    <div class="hero">
+      <div class="burst" aria-hidden="true">🤪</div>
+      <h1 id="homeTitle" data-screen-title tabindex="-1">Sounds wrong.<br>Feels right.</h1>
+      <p class="sub">Race through two kinds of warped sayings: Synonym Twists and Mixed Messages.</p>
+      <button class="btn primary" type="button" onclick="go('setup')">PLAY NOW</button>
+      <button class="btn ghost" type="button" onclick="go('how')">HOW TO PLAY</button>
+    </div>
+  </section>
+
+  <section id="how" class="screen" aria-labelledby="howTitle" aria-hidden="true">
+    <div class="setup">
+      <h2 id="howTitle" data-screen-title tabindex="-1">How to play</h2>
+      <ol class="rules">
+        <li>Split into two teams. On each turn, a reader from the opposing team holds the phone and keeps score.</li>
+        <li><b>Synonym Twist:</b> the saying is rebuilt with indirect substitutes. Example: “outer edge of your mouth muscle” means “tip of your tongue.”</li>
+        <li><b>Mixed Message:</b> a riddle-like description points to the whole saying. Both styles are mixed into one deck.</li>
+        <li>The reader says only what is shown. Only the active team guesses; close wording that clearly identifies the standard phrase counts.</li>
+        <li>Only the active team may guess. Tap <b>Got it!</b> for a point. You get two skips per turn; revealing an answer uses a skip and earns no point.</li>
+        <li>When time runs out, swap roles. Both teams always get the same number of turns; the higher score after reaching the target wins.</li>
+      </ol>
+      <button class="btn primary" type="button" onclick="go('setup')">LET'S PLAY</button>
+      <button class="btn ghost" type="button" onclick="go('home')">BACK</button>
+    </div>
+  </section>
+
+  <section id="setup" class="screen" aria-labelledby="setupTitle" aria-hidden="true">
+    <div class="setup">
+      <h2 id="setupTitle" data-screen-title tabindex="-1">Set the table</h2>
+      <div class="field">
+        <label for="t1">Team 1</label>
+        <input id="t1" value="Hot Dogs" maxlength="18" autocomplete="off" />
+      </div>
+      <div class="field">
+        <label for="t2">Team 2</label>
+        <input id="t2" value="Cool Cats" maxlength="18" autocomplete="off" />
+      </div>
+      <fieldset class="field">
+        <legend>Seconds per turn</legend>
+        <div class="seg" id="times">
+          <button class="on" type="button" data-v="30" aria-label="30 seconds" aria-pressed="true">30</button>
+          <button type="button" data-v="45" aria-label="45 seconds" aria-pressed="false">45</button>
+          <button type="button" data-v="60" aria-label="60 seconds" aria-pressed="false">60</button>
+        </div>
+      </fieldset>
+      <fieldset class="field">
+        <legend>Points to win</legend>
+        <div class="seg" id="targets">
+          <button type="button" data-v="7" aria-label="7 points" aria-pressed="false">7</button>
+          <button class="on" type="button" data-v="10" aria-label="10 points" aria-pressed="true">10</button>
+          <button type="button" data-v="15" aria-label="15 points" aria-pressed="false">15</button>
+        </div>
+      </fieldset>
+      <button class="btn primary" type="button" onclick="startGame()">START GAME</button>
+      <button class="btn ghost" type="button" onclick="go('home')">BACK</button>
+    </div>
+  </section>
+
+  <section id="turn" class="screen" aria-labelledby="turnTitle" aria-hidden="true">
+    <div class="winner">
+      <div class="burst" aria-hidden="true">📣</div>
+      <h2 id="turnTitle" data-screen-title tabindex="-1"></h2>
+      <p class="sub">The other team chooses a reader.<br>They hold the phone and read your clues.</p>
+      <button class="btn yellow" type="button" onclick="startRound()">READY — START TIMER</button>
+      <button class="btn ghost" type="button" onclick="go('setup')">CHANGE SETUP</button>
+    </div>
+  </section>
+
+  <section id="game" class="screen" aria-labelledby="gameTitle" aria-hidden="true">
+    <h2 id="gameTitle" class="sr-only" data-screen-title tabindex="-1">Round in progress</h2>
+    <div class="scorebar" role="group" aria-label="Scoreboard">
+      <div id="teamA" class="team" role="group" aria-current="true">
+        <span class="score" id="s1">0</span>
+        <span id="n1"></span>
+        <span class="turn-marker" aria-hidden="true">GUESSING</span>
+      </div>
+      <div class="timer" id="clock" role="timer" aria-label="30 seconds remaining">30</div>
+      <div id="teamB" class="team" role="group" aria-current="false">
+        <span class="score" id="s2">0</span>
+        <span id="n2"></span>
+        <span class="turn-marker" aria-hidden="true">GUESSING</span>
+      </div>
+    </div>
+    <div class="card" role="group" aria-labelledby="gib" aria-describedby="cardHint">
+      <div class="gib" id="gib"></div>
+      <div class="hint" id="cardHint">Which familiar saying does this mean?</div>
+      <div class="answer" id="answer"></div>
+    </div>
+    <div class="controls">
+      <button id="skipBtn" class="btn ghost" type="button" onclick="skip()">SKIP (2)</button>
+      <button id="correctBtn" class="btn primary" type="button" onclick="correct()">GOT IT! ✓</button>
+    </div>
+    <button id="revealBtn" class="btn ghost reveal-btn" type="button" onclick="reveal()">REVEAL + SKIP</button>
+    <div class="tiny">Reader: no extra hints — only read what’s shown!</div>
+  </section>
+
+  <section id="win" class="screen" aria-labelledby="winTitle" aria-hidden="true">
+    <div class="winner">
+      <div class="burst" aria-hidden="true">🏆</div>
+      <h1 id="winTitle" data-screen-title tabindex="-1"></h1>
+      <p class="sub" id="finalScore"></p>
+      <button class="btn primary" type="button" onclick="rematch()">REMATCH</button>
+      <button class="btn ghost" type="button" onclick="go('setup')">NEW GAME</button>
+    </div>
+  </section>
+
+  <p id="announcer" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></p>
+</main>
+<script src="cards.js"></script>
+<script>
 
 const ACTION_LOCK_MS=400;
 let state={names:['Hot Dogs','Cool Cats'],scores:[0,0],team:0,startingTeam:0,turnsCompleted:0,time:30,target:10,deck:[],idx:0,left:30,timer:null,revealTimer:null,actionTimer:null,roundToken:0,endsAt:0,currentAnswer:'',sound:true,skips:2,revealing:false,roundActive:false,actionLocked:false};
 let audioContext=null;
-const $=id=>document.getElementById(id);function go(id){document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));$(id).classList.add('active')}
-document.querySelectorAll('.seg').forEach(seg=>seg.onclick=e=>{if(e.target.tagName==='BUTTON'){seg.querySelectorAll('button').forEach(b=>b.classList.remove('on'));e.target.classList.add('on')}});$('sound').onclick=()=>{state.sound=!state.sound;$('sound').textContent=state.sound?'🔊':'🔇';if(state.sound)prepareAudio()};
+let actionFocus=null;
+const $=id=>document.getElementById(id);const screenTitles={home:'homeTitle',how:'howTitle',setup:'setupTitle',turn:'turnTitle',game:'gameTitle',win:'winTitle'};
+function go(id){document.querySelectorAll('.screen').forEach(screen=>{const active=screen.id===id;screen.classList.toggle('active',active);screen.setAttribute('aria-hidden',String(!active))});const title=$(screenTitles[id]);title.focus({preventScroll:true});setTimeout(()=>title.focus({preventScroll:true}),0)}
+function announce(message){$('announcer').textContent=message}
+document.querySelectorAll('.seg').forEach(seg=>seg.onclick=e=>{if(e.target.tagName==='BUTTON'){seg.querySelectorAll('button').forEach(button=>{const selected=button===e.target;button.classList.toggle('on',selected);button.setAttribute('aria-pressed',String(selected))})}});
+function syncSound(){$('soundIcon').textContent=state.sound?'🔊':'🔇';$('sound').setAttribute('aria-pressed',String(state.sound));$('sound').setAttribute('aria-label',state.sound?'Mute sounds':'Turn sounds on')}
+$('sound').onclick=()=>{state.sound=!state.sound;syncSound();if(state.sound)prepareAudio()};
 function prepareAudio(){if(!state.sound)return null;try{const AudioContextClass=window.AudioContext||window.webkitAudioContext;if(!AudioContextClass)return null;if(!audioContext||audioContext.state==='closed')audioContext=new AudioContextClass();if(audioContext.state==='suspended'){const resumed=audioContext.resume();if(resumed&&typeof resumed.catch==='function')resumed.catch(()=>{})}return audioContext}catch{return null}}
 function tone(freq=520,dur=.08){const a=prepareAudio();if(!a)return;try{const o=a.createOscillator(),g=a.createGain();o.frequency.value=freq;o.type='sine';g.gain.setValueAtTime(.12,a.currentTime);g.gain.exponentialRampToValueAtTime(.001,a.currentTime+dur);o.connect(g).connect(a.destination);o.start();o.stop(a.currentTime+dur)}catch{}}
 function shuffle(a,random=Math.random){const shuffled=[...a];for(let i=shuffled.length-1;i>0;i--){const j=Math.floor(random()*(i+1));[shuffled[i],shuffled[j]]=[shuffled[j],shuffled[i]]}return shuffled}const answerAliases={gobacktosquareone:'backtosquareone',wereallinthesameboat:'allinthesameboat',dontputallyoureggsinonebasket:'putallyoureggsinonebasket'};function answerKey(answer){const k=answer.toLowerCase().replace(/[^a-z0-9]/g,'');return answerAliases[k]||k}function makeDeck(avoid=''){const seen=new Set(),d=[];for(const c of shuffle(cards)){const k=answerKey(c[1]);if(!seen.has(k)){seen.add(k);d.push(c)}}if(avoid&&d.length>1&&answerKey(d[0][1])===answerKey(avoid))d.push(d.shift());return d}
-function startGame(){clearInterval(state.timer);clearTimeout(state.revealTimer);clearTimeout(state.actionTimer);state.roundToken++;state.roundActive=false;state.revealing=false;state.actionLocked=false;state.names=[$('t1').value.trim()||'Team 1',$('t2').value.trim()||'Team 2'];state.time=+$('times').querySelector('.on').dataset.v;state.target=+$('targets').querySelector('.on').dataset.v;state.scores=[0,0];state.startingTeam=0;state.team=0;state.turnsCompleted=0;state.deck=makeDeck();state.idx=0;update();prepTurn()}
-function update(){$('n1').textContent=state.names[0];$('n2').textContent=state.names[1];$('s1').textContent=state.scores[0];$('s2').textContent=state.scores[1];$('teamA').classList.toggle('active-team',state.team===0);$('teamB').classList.toggle('active-team',state.team===1)}
+function startGame(){clearInterval(state.timer);clearTimeout(state.revealTimer);clearTimeout(state.actionTimer);actionFocus=null;state.roundToken++;state.roundActive=false;state.revealing=false;state.actionLocked=false;state.names=[$('t1').value.trim()||'Team 1',$('t2').value.trim()||'Team 2'];state.time=+$('times').querySelector('.on').dataset.v;state.target=+$('targets').querySelector('.on').dataset.v;state.scores=[0,0];state.startingTeam=0;state.team=0;state.turnsCompleted=0;state.deck=makeDeck();state.idx=0;update();prepTurn()}
+function update(){$('n1').textContent=state.names[0];$('n2').textContent=state.names[1];$('s1').textContent=state.scores[0];$('s2').textContent=state.scores[1];[0,1].forEach(team=>{const element=$(team===0?'teamA':'teamB'),active=state.team===team;element.classList.toggle('active-team',active);element.setAttribute('aria-current',String(active));element.setAttribute('aria-label',`${state.names[team]}: ${state.scores[team]} points${active?', guessing':''}`)})}
 function prepTurn(){$('turnTitle').textContent=`${state.names[state.team]}, you're up!`;go('turn')}
-function syncControls(){$('skipBtn').textContent=`SKIP (${state.skips})`;const blocked=!state.roundActive||state.revealing||state.actionLocked;$('correctBtn').disabled=blocked;$('skipBtn').disabled=blocked||state.skips<=0;$('revealBtn').disabled=blocked||state.skips<=0}
-function lockActions(){state.actionLocked=true;clearTimeout(state.actionTimer);syncControls();state.actionTimer=setTimeout(()=>{state.actionLocked=false;syncControls()},ACTION_LOCK_MS)}
+function setClock(left){$('clock').textContent=left;$('clock').setAttribute('aria-label',`${left} second${left===1?'':'s'} remaining`)}
+function restoreActionFocus(){if(actionFocus&&!actionFocus.disabled&&state.roundActive){const target=actionFocus;actionFocus=null;target.focus({preventScroll:true})}}
+function syncControls(){$('skipBtn').textContent=`SKIP (${state.skips})`;const blocked=!state.roundActive||state.revealing||state.actionLocked;$('correctBtn').disabled=blocked;$('skipBtn').disabled=blocked||state.skips<=0;$('revealBtn').disabled=blocked||state.skips<=0;restoreActionFocus()}
+function lockActions(){const focused=document.activeElement;actionFocus=[$('correctBtn'),$('skipBtn'),$('revealBtn')].includes(focused)?focused:null;state.actionLocked=true;clearTimeout(state.actionTimer);syncControls();state.actionTimer=setTimeout(()=>{state.actionLocked=false;syncControls()},ACTION_LOCK_MS)}
 function claimAction(){if(!state.roundActive||state.revealing||state.actionLocked)return false;if(Date.now()>=state.endsAt){endRound();return false}lockActions();return true}
-function startRound(){if(state.roundActive)return;clearInterval(state.timer);clearTimeout(state.revealTimer);clearTimeout(state.actionTimer);const token=++state.roundToken;state.roundActive=true;state.actionLocked=false;state.left=state.time;state.endsAt=Date.now()+state.time*1000;state.skips=2;state.revealing=false;$('clock').textContent=state.left;prepareAudio();next();update();syncControls();go('game');let beeped=99;state.timer=setInterval(()=>{if(token!==state.roundToken||!state.roundActive)return;const left=Math.max(0,Math.ceil((state.endsAt-Date.now())/1000));if(left!==state.left){state.left=left;$('clock').textContent=left}if(left<=5&&left>0&&left!==beeped){beeped=left;tone(300,.04)}if(left<=0)endRound()},100)}
-function next(){if(state.idx>=state.deck.length){state.deck=makeDeck(state.currentAnswer);state.idx=0}let c=state.deck[state.idx++];state.currentAnswer=c[1];document.querySelector('.card').dataset.mode=c[3];$('gib').textContent=c[0];$('answer').textContent=c[1];$('answer').classList.remove('show')}
-function correct(){if(!claimAction())return;state.scores[state.team]++;update();next();tone(740,.12)}
+function startRound(){if(state.roundActive)return;clearInterval(state.timer);clearTimeout(state.revealTimer);clearTimeout(state.actionTimer);actionFocus=null;const token=++state.roundToken;state.roundActive=true;state.actionLocked=false;state.left=state.time;state.endsAt=Date.now()+state.time*1000;state.skips=2;state.revealing=false;setClock(state.left);prepareAudio();next(`${state.names[state.team]} round started. ${state.time} seconds. First clue: `);update();syncControls();go('game');let beeped=99;state.timer=setInterval(()=>{if(token!==state.roundToken||!state.roundActive)return;const left=Math.max(0,Math.ceil((state.endsAt-Date.now())/1000));if(left!==state.left){state.left=left;setClock(left)}if(left<=5&&left>0&&left!==beeped){beeped=left;if(left===5)announce('5 seconds remaining.');tone(300,.04)}if(left<=0)endRound()},100)}
+function next(prefix='Next clue: '){if(state.idx>=state.deck.length){state.deck=makeDeck(state.currentAnswer);state.idx=0}let c=state.deck[state.idx++];state.currentAnswer=c[1];document.querySelector('.card').dataset.mode=c[3];$('gib').textContent=c[0];$('answer').textContent=c[1];$('answer').classList.remove('show');announce(`${prefix}${c[3]}. ${c[0]}`)}
+function correct(){if(!claimAction())return;state.scores[state.team]++;update();next(`${state.names[state.team]} score ${state.scores[state.team]}. Next clue: `);tone(740,.12)}
 function useSkip(){if(state.skips<=0||!claimAction())return false;state.skips--;syncControls();return true}
-function skip(){if(!useSkip())return;next();tone(220,.05)}
-function reveal(){if(!useSkip())return;state.revealing=true;$('answer').classList.add('show');syncControls();const token=state.roundToken;state.revealTimer=setTimeout(()=>{if(token!==state.roundToken||!state.roundActive)return;state.revealing=false;next();syncControls()},1400)}
-function endRound(){if(!state.roundActive)return;state.roundActive=false;clearInterval(state.timer);clearTimeout(state.revealTimer);clearTimeout(state.actionTimer);state.roundToken++;state.revealing=false;state.actionLocked=false;syncControls();state.turnsCompleted++;if(state.turnsCompleted%2===0&&(state.scores[0]>=state.target||state.scores[1]>=state.target)&&state.scores[0]!==state.scores[1]){const w=state.scores[0]>state.scores[1]?0:1;$('winTitle').textContent=`${state.names[w]} win!`;$('finalScore').textContent=`Final score: ${state.scores[0]}–${state.scores[1]}`;go('win');tone(180,.3);return}state.team=1-state.team;update();prepTurn();tone(180,.3)}
+function skip(){if(!useSkip())return;next('Skipped. Next clue: ');tone(220,.05)}
+function reveal(){if(!useSkip())return;state.revealing=true;$('answer').classList.add('show');announce(`Answer: ${state.currentAnswer}`);syncControls();const token=state.roundToken;state.revealTimer=setTimeout(()=>{if(token!==state.roundToken||!state.roundActive)return;state.revealing=false;next();syncControls()},1400)}
+function endRound(){if(!state.roundActive)return;state.roundActive=false;clearInterval(state.timer);clearTimeout(state.revealTimer);clearTimeout(state.actionTimer);actionFocus=null;state.roundToken++;state.revealing=false;state.actionLocked=false;syncControls();state.turnsCompleted++;if(state.turnsCompleted%2===0&&(state.scores[0]>=state.target||state.scores[1]>=state.target)&&state.scores[0]!==state.scores[1]){const w=state.scores[0]>state.scores[1]?0:1;$('winTitle').textContent=`${state.names[w]} win!`;$('finalScore').textContent=`Final score: ${state.scores[0]}–${state.scores[1]}`;go('win');tone(180,.3);return}state.team=1-state.team;update();prepTurn();tone(180,.3)}
 function rematch(){state.scores=[0,0];state.startingTeam=1-state.startingTeam;state.team=state.startingTeam;state.turnsCompleted=0;state.deck=makeDeck();state.idx=0;update();prepTurn()}
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&state.roundActive&&Date.now()>=state.endsAt)endRound()});
 </script></body></html>

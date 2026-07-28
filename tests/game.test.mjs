@@ -5,6 +5,10 @@ import vm from "node:vm";
 
 const cardsSource = readFileSync(new URL("../cards.js", import.meta.url), "utf8");
 const htmlSource = readFileSync(new URL("../index.html", import.meta.url), "utf8");
+const stylesSource = readFileSync(
+  new URL("../styles.css", import.meta.url),
+  "utf8",
+);
 const inlineScripts = [
   ...htmlSource.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/g),
 ]
@@ -41,10 +45,37 @@ class Element {
     this.id = id;
     this.classList = new ClassList(classes);
     this.dataset = {};
-    this.disabled = false;
+    this._disabled = false;
     this.tagName = "DIV";
     this.textContent = "";
     this.value = "";
+    this.attributes = new Map();
+    this.ownerDocument = null;
+  }
+
+  get disabled() {
+    return this._disabled;
+  }
+
+  set disabled(value) {
+    this._disabled = Boolean(value);
+    if (this._disabled && this.ownerDocument?.activeElement === this) {
+      this.ownerDocument.activeElement = null;
+    }
+  }
+
+  focus() {
+    if (this.ownerDocument && !this.disabled) {
+      this.ownerDocument.activeElement = this;
+    }
+  }
+
+  getAttribute(name) {
+    return this.attributes.get(name) ?? null;
+  }
+
+  setAttribute(name, value) {
+    this.attributes.set(name, String(value));
   }
 
   querySelector(selector) {
@@ -69,10 +100,14 @@ function createFixture({ audio = "missing" } = {}) {
 
   const ids = [
     "sound",
+    "soundIcon",
     "t1",
     "t2",
     "times",
     "targets",
+    "homeTitle",
+    "howTitle",
+    "setupTitle",
     "n1",
     "n2",
     "s1",
@@ -80,6 +115,7 @@ function createFixture({ audio = "missing" } = {}) {
     "teamA",
     "teamB",
     "turnTitle",
+    "gameTitle",
     "skipBtn",
     "correctBtn",
     "revealBtn",
@@ -88,6 +124,7 @@ function createFixture({ audio = "missing" } = {}) {
     "answer",
     "winTitle",
     "finalScore",
+    "announcer",
   ];
   const elements = Object.fromEntries(ids.map((id) => [id, new Element(id)]));
   elements.t1.value = "Hot Dogs";
@@ -117,6 +154,7 @@ function createFixture({ audio = "missing" } = {}) {
   const card = new Element("", "card");
 
   const document = {
+    activeElement: null,
     hidden: false,
     addEventListener(name, listener) {
       listeners.set(name, listener);
@@ -133,6 +171,15 @@ function createFixture({ audio = "missing" } = {}) {
       return [];
     },
   };
+  [
+    ...Object.values(elements),
+    ...elements.times.buttons,
+    ...elements.targets.buttons,
+    ...screens,
+    card,
+  ].forEach((element) => {
+    element.ownerDocument = document;
+  });
 
   class WorkingAudioContext {
     constructor() {
@@ -305,6 +352,78 @@ test("shuffle is deterministic with an injected RNG and does not mutate input", 
   assert.doesNotMatch(appSource, /\.sort\(\s*\(\)\s*=>\s*Math\.random/);
 });
 
+test("markup and responsive styles preserve core accessibility guarantees", () => {
+  assert.match(
+    htmlSource,
+    /<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" \/>/,
+  );
+  assert.doesNotMatch(htmlSource, /user-scalable\s*=\s*no/i);
+  assert.match(htmlSource, /<label for="t1">Team 1<\/label>/);
+  assert.match(htmlSource, /<label for="t2">Team 2<\/label>/);
+  assert.match(htmlSource, /<fieldset class="field">[\s\S]*?<legend>Seconds per turn<\/legend>/);
+  assert.match(htmlSource, /aria-pressed="true"/);
+  assert.match(htmlSource, /role="timer"/);
+  assert.match(htmlSource, /aria-live="polite"/);
+
+  assert.match(
+    stylesSource,
+    /grid-template-columns:\s*minmax\(0,\s*1fr\)\s+auto\s+minmax\(0,\s*1fr\)/,
+  );
+  const cssRule = (selector) => {
+    const escaped = selector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    return stylesSource.match(new RegExp(`${escaped}\\s*\\{([^}]*)\\}`))?.[1] ?? "";
+  };
+  assert.match(cssRule(".team"), /overflow-wrap:\s*anywhere/);
+  assert.match(
+    stylesSource,
+    /#turnTitle,\s*#winTitle\s*\{[^}]*overflow-wrap:\s*anywhere/,
+  );
+  assert.match(stylesSource, /@media\s*\(prefers-reduced-motion:\s*reduce\)/);
+  assert.match(cssRule(".pill"), /min-width:\s*44px/);
+  assert.match(cssRule(".hint"), /opacity:\s*0\.68/);
+  assert.match(cssRule(".team.active-team"), /color:\s*#a92916/);
+  assert.match(
+    cssRule(".active-team .turn-marker"),
+    /display:\s*block/,
+  );
+  assert.match(stylesSource, /env\(safe-area-inset-left\)/);
+  assert.match(stylesSource, /env\(safe-area-inset-right\)/);
+});
+
+test("screen focus, choice state, and sound state stay synchronized", () => {
+  const fixture = createFixture();
+
+  fixture.run("go('setup')");
+  assert.equal(fixture.value("document.activeElement.id"), "setupTitle");
+  assert.equal(fixture.elements.home.getAttribute("aria-hidden"), "true");
+  assert.equal(fixture.elements.setup.getAttribute("aria-hidden"), "false");
+
+  const [, fortyFive] = fixture.elements.times.buttons;
+  fixture.elements.times.onclick({ target: fortyFive });
+  assert.equal(fixture.elements.times.buttons[0].getAttribute("aria-pressed"), "false");
+  assert.equal(fortyFive.getAttribute("aria-pressed"), "true");
+  assert.equal(fortyFive.classList.contains("on"), true);
+
+  fixture.elements.sound.onclick();
+  assert.equal(fixture.elements.sound.getAttribute("aria-pressed"), "false");
+  assert.equal(fixture.elements.sound.getAttribute("aria-label"), "Turn sounds on");
+  assert.equal(fixture.elements.soundIcon.textContent, "🔇");
+
+  fixture.run("startGame(); startRound()");
+  assert.equal(fixture.value("document.activeElement.id"), "gameTitle");
+  assert.equal(
+    fixture.elements.teamA.getAttribute("aria-label"),
+    "Hot Dogs: 0 points, guessing",
+  );
+  assert.equal(fixture.elements.clock.getAttribute("aria-label"), "45 seconds remaining");
+  assert.equal(
+    fixture.elements.announcer.textContent,
+    fixture.value(
+      "`${state.names[state.team]} round started. 45 seconds. First clue: ${document.querySelector('.card').dataset.mode}. ${document.getElementById('gib').textContent}`",
+    ),
+  );
+});
+
 test("round actions reject duplicate clicks and post-deadline scoring", () => {
   const fixture = createFixture();
   fixture.run("startGame(); state.sound = false; startRound()");
@@ -338,6 +457,33 @@ test("round actions reject duplicate clicks and post-deadline scoring", () => {
   assert.equal(fixture.value("state.roundActive"), false);
   assert.equal(fixture.value("state.team"), 1);
   assert.equal(visibleScreen(fixture), "turn");
+});
+
+test("locked actions restore keyboard focus and announce changing card content", () => {
+  const fixture = createFixture();
+  fixture.run("startGame(); state.sound = false; startRound()");
+
+  fixture.elements.correctBtn.focus();
+  fixture.run("correct()");
+  assert.equal(fixture.value("document.activeElement?.id"), undefined);
+  assert.match(
+    fixture.elements.announcer.textContent,
+    /^Hot Dogs score 1\. Next clue: (MIXED MESSAGE|SYNONYM TWIST)\. /,
+  );
+  fixture.advance(400);
+  assert.equal(fixture.value("document.activeElement.id"), "correctBtn");
+
+  fixture.elements.revealBtn.focus();
+  const answer = fixture.value("state.currentAnswer");
+  fixture.run("reveal()");
+  assert.equal(fixture.elements.announcer.textContent, `Answer: ${answer}`);
+  assert.equal(fixture.value("document.activeElement?.id"), undefined);
+  fixture.advance(1_400);
+  assert.equal(fixture.value("document.activeElement.id"), "revealBtn");
+  assert.match(
+    fixture.elements.announcer.textContent,
+    /^Next clue: (MIXED MESSAGE|SYNONYM TWIST)\. /,
+  );
 });
 
 test("skip and reveal controls expose every no-op state", () => {
@@ -397,6 +543,8 @@ test("equal turns, target ties, and alternating rematches are preserved", () => 
   `);
   assert.equal(visibleScreen(fixture), "turn");
   assert.equal(fixture.value("state.team"), 1);
+  assert.equal(fixture.elements.teamA.getAttribute("aria-current"), "false");
+  assert.equal(fixture.elements.teamB.getAttribute("aria-current"), "true");
 
   fixture.run(`
     startRound();
@@ -441,6 +589,7 @@ test("countdown interval renders remaining seconds and ends at zero", () => {
   fixture.advance(25_000);
   fixture.runIntervals();
   assert.equal(fixture.elements.clock.textContent, 5);
+  assert.equal(fixture.elements.announcer.textContent, "5 seconds remaining.");
   assert.equal(fixture.value("state.roundActive"), true);
   assert.equal(visibleScreen(fixture), "game");
 

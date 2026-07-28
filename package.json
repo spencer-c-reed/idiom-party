@@ -1,7 +1,12 @@
 {
   "name": "idiom-party",
   "private": true,
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
+    "check": "npm test && npm run test:browser",
+    "test:browser": "node tests/browser-smoke.mjs",
     "test": "node --test --test-concurrency=1 tests/*.test.mjs"
   }
 }
