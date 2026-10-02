@@ -497,3 +497,9 @@ fieldset.field {
     margin-top: 7px;
   }
 }
+
+/* Deck choices extend the existing setup controls. */
+:root { color-scheme: light; }
+.deck-chips { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.deck-chips button { cursor: pointer; }
+[hidden] { display: none !important; }

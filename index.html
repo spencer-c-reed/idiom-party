@@ -20,7 +20,7 @@
     <div class="hero">
       <div class="burst" aria-hidden="true">🤪</div>
       <h1 id="homeTitle" data-screen-title tabindex="-1">Sounds wrong.<br>Feels right.</h1>
-      <p class="sub">Race through two kinds of warped sayings: Synonym Twists and Mixed Messages.</p>
+      <p class="sub">Warped sayings or dinner-table classics.<br>One phone. Two teams. Beat the clock.</p>
       <button class="btn primary" type="button" onclick="go('setup')">PLAY NOW</button>
       <button class="btn ghost" type="button" onclick="go('how')">HOW TO PLAY</button>
     </div>
@@ -32,7 +32,8 @@
       <ol class="rules">
         <li>Split into two teams. On each turn, a reader from the opposing team holds the phone and keeps score.</li>
         <li><b>Synonym Twist:</b> the saying is rebuilt with indirect substitutes. Example: “outer edge of your mouth muscle” means “tip of your tongue.”</li>
-        <li><b>Mixed Message:</b> a riddle-like description points to the whole saying. Both styles are mixed into one deck.</li>
+        <li><b>Mixed Message:</b> a riddle-like description points to the whole saying. Choose either style or mix them together.</li>
+        <li><b>Dinner table:</b> the reader reads the meaning; the team guesses the saying. Pick all 120 cards or one of three categories.</li>
         <li>The reader says only what is shown. Only the active team guesses; close wording that clearly identifies the standard phrase counts.</li>
         <li>Only the active team may guess. Tap <b>Got it!</b> for a point. You get two skips per turn; revealing an answer uses a skip and earns no point.</li>
         <li>When time runs out, swap roles. Both teams always get the same number of turns; the higher score after reaching the target wins.</li>
@@ -45,6 +46,24 @@
   <section id="setup" class="screen" aria-labelledby="setupTitle" aria-hidden="true">
     <div class="setup">
       <h2 id="setupTitle" data-screen-title tabindex="-1">Set the table</h2>
+      <fieldset class="field">
+        <legend>Choose your deck</legend>
+        <div class="seg deck-chips" id="decks">
+          <button class="on" type="button" data-v="mixed" aria-pressed="true">Mixed sayings</button>
+          <button type="button" data-v="SYNONYM TWIST" aria-pressed="false">Synonym Twists</button>
+          <button type="button" data-v="MIXED MESSAGE" aria-pressed="false">Mixed Messages</button>
+          <button type="button" data-v="dinner" aria-pressed="false">Dinner table · 120</button>
+        </div>
+      </fieldset>
+      <fieldset class="field" id="dinnerCategories" hidden>
+        <legend>Dinner-table category</legend>
+        <div class="seg deck-chips" id="categories">
+          <button class="on" type="button" data-v="All" aria-pressed="true">All · 120</button>
+          <button type="button" data-v="Easy classics" aria-pressed="false">Easy classics · 40</button>
+          <button type="button" data-v="Food &amp; life" aria-pressed="false">Food &amp; life · 40</button>
+          <button type="button" data-v="Difficult delightful" aria-pressed="false">Difficult delightful · 40</button>
+        </div>
+      </fieldset>
       <div class="field">
         <label for="t1">Team 1</label>
         <input id="t1" value="Hot Dogs" maxlength="18" autocomplete="off" />
@@ -78,7 +97,7 @@
     <div class="winner">
       <div class="burst" aria-hidden="true">📣</div>
       <h2 id="turnTitle" data-screen-title tabindex="-1"></h2>
-      <p class="sub">The other team chooses a reader.<br>They hold the phone and read your clues.</p>
+      <p class="sub" id="handoff">The other team chooses a reader.<br>They hold the phone and read your clues.</p>
       <button class="btn yellow" type="button" onclick="startRound()">READY — START TIMER</button>
       <button class="btn ghost" type="button" onclick="go('setup')">CHANGE SETUP</button>
     </div>
@@ -128,33 +147,34 @@
 <script>
 
 const ACTION_LOCK_MS=400;
-let state={names:['Hot Dogs','Cool Cats'],scores:[0,0],team:0,startingTeam:0,turnsCompleted:0,time:30,target:10,deck:[],idx:0,left:30,timer:null,revealTimer:null,actionTimer:null,roundToken:0,endsAt:0,currentAnswer:'',sound:true,skips:2,revealing:false,roundActive:false,actionLocked:false};
+let state={names:['Hot Dogs','Cool Cats'],scores:[0,0],team:0,startingTeam:0,turnsCompleted:0,time:30,target:10,deck:[],idx:0,left:30,timer:null,revealTimer:null,actionTimer:null,roundToken:0,endsAt:0,currentAnswer:'',sound:true,skips:2,revealing:false,roundActive:false,actionLocked:false,mode:'mixed',category:'All'};
 let audioContext=null;
 let actionFocus=null;
 const $=id=>document.getElementById(id);const screenTitles={home:'homeTitle',how:'howTitle',setup:'setupTitle',turn:'turnTitle',game:'gameTitle',win:'winTitle'};
-function go(id){document.querySelectorAll('.screen').forEach(screen=>{const active=screen.id===id;screen.classList.toggle('active',active);screen.setAttribute('aria-hidden',String(!active))});const title=$(screenTitles[id]);title.focus({preventScroll:true});setTimeout(()=>title.focus({preventScroll:true}),0)}
+function go(id){window.scrollTo?.({top:0,behavior:'instant'});document.querySelectorAll('.screen').forEach(screen=>{const active=screen.id===id;screen.classList.toggle('active',active);screen.setAttribute('aria-hidden',String(!active))});const title=$(screenTitles[id]);title.focus({preventScroll:true});setTimeout(()=>title.focus({preventScroll:true}),0)}
 function announce(message){$('announcer').textContent=message}
-document.querySelectorAll('.seg').forEach(seg=>seg.onclick=e=>{if(e.target.tagName==='BUTTON'){seg.querySelectorAll('button').forEach(button=>{const selected=button===e.target;button.classList.toggle('on',selected);button.setAttribute('aria-pressed',String(selected))})}});
+document.querySelectorAll('.seg').forEach(seg=>seg.onclick=e=>{if(e.target.tagName==='BUTTON'){seg.querySelectorAll('button').forEach(button=>{const selected=button===e.target;button.classList.toggle('on',selected);button.setAttribute('aria-pressed',String(selected))});if(seg.id==='decks')$('dinnerCategories').hidden=e.target.dataset.v!=='dinner'}});
 function syncSound(){$('soundIcon').textContent=state.sound?'🔊':'🔇';$('sound').setAttribute('aria-pressed',String(state.sound));$('sound').setAttribute('aria-label',state.sound?'Mute sounds':'Turn sounds on')}
 $('sound').onclick=()=>{state.sound=!state.sound;syncSound();if(state.sound)prepareAudio()};
 function prepareAudio(){if(!state.sound)return null;try{const AudioContextClass=window.AudioContext||window.webkitAudioContext;if(!AudioContextClass)return null;if(!audioContext||audioContext.state==='closed')audioContext=new AudioContextClass();if(audioContext.state==='suspended'){const resumed=audioContext.resume();if(resumed&&typeof resumed.catch==='function')resumed.catch(()=>{})}return audioContext}catch{return null}}
 function tone(freq=520,dur=.08){const a=prepareAudio();if(!a)return;try{const o=a.createOscillator(),g=a.createGain();o.frequency.value=freq;o.type='sine';g.gain.setValueAtTime(.12,a.currentTime);g.gain.exponentialRampToValueAtTime(.001,a.currentTime+dur);o.connect(g).connect(a.destination);o.start();o.stop(a.currentTime+dur)}catch{}}
-function shuffle(a,random=Math.random){const shuffled=[...a];for(let i=shuffled.length-1;i>0;i--){const j=Math.floor(random()*(i+1));[shuffled[i],shuffled[j]]=[shuffled[j],shuffled[i]]}return shuffled}const answerAliases={gobacktosquareone:'backtosquareone',wereallinthesameboat:'allinthesameboat',dontputallyoureggsinonebasket:'putallyoureggsinonebasket'};function answerKey(answer){const k=answer.toLowerCase().replace(/[^a-z0-9]/g,'');return answerAliases[k]||k}function makeDeck(avoid=''){const seen=new Set(),d=[];for(const c of shuffle(cards)){const k=answerKey(c[1]);if(!seen.has(k)){seen.add(k);d.push(c)}}if(avoid&&d.length>1&&answerKey(d[0][1])===answerKey(avoid))d.push(d.shift());return d}
-function startGame(){clearInterval(state.timer);clearTimeout(state.revealTimer);clearTimeout(state.actionTimer);actionFocus=null;state.roundToken++;state.roundActive=false;state.revealing=false;state.actionLocked=false;state.names=[$('t1').value.trim()||'Team 1',$('t2').value.trim()||'Team 2'];state.time=+$('times').querySelector('.on').dataset.v;state.target=+$('targets').querySelector('.on').dataset.v;state.scores=[0,0];state.startingTeam=0;state.team=0;state.turnsCompleted=0;state.deck=makeDeck();state.idx=0;update();prepTurn()}
+function shuffle(a,random=Math.random){const shuffled=[...a];for(let i=shuffled.length-1;i>0;i--){const j=Math.floor(random()*(i+1));[shuffled[i],shuffled[j]]=[shuffled[j],shuffled[i]]}return shuffled}const answerAliases={gobacktosquareone:'backtosquareone',wereallinthesameboat:'allinthesameboat',dontputallyoureggsinonebasket:'putallyoureggsinonebasket'};function answerKey(answer){const k=answer.toLowerCase().replace(/[^a-z0-9]/g,'');return answerAliases[k]||k}function makeDeck(avoid=''){const seen=new Set(),d=[];const pool=state.mode==='dinner'?dinnerCards.filter(c=>state.category==='All'||c.deck===state.category).map(c=>[c.answer,c.idiom,c.explanation,c.deck]):cards.filter(c=>state.mode==='mixed'||c[3]===state.mode);for(const c of shuffle(pool)){const k=answerKey(c[1]);if(state.mode==='dinner'||!seen.has(k)){seen.add(k);d.push(c)}}if(avoid&&d.length>1&&answerKey(d[0][1])===answerKey(avoid))d.push(d.shift());return d}
+function startGame(){clearInterval(state.timer);clearTimeout(state.revealTimer);clearTimeout(state.actionTimer);actionFocus=null;state.roundToken++;state.roundActive=false;state.revealing=false;state.actionLocked=false;state.names=[$('t1').value.trim()||'Team 1',$('t2').value.trim()||'Team 2'];state.time=+$('times').querySelector('.on').dataset.v;state.target=+$('targets').querySelector('.on').dataset.v;state.mode=$('decks').querySelector('.on').dataset.v;state.category=$('categories').querySelector('.on').dataset.v;state.scores=[0,0];state.startingTeam=0;state.team=0;state.turnsCompleted=0;state.deck=makeDeck();state.idx=0;update();prepTurn()}
 function update(){$('n1').textContent=state.names[0];$('n2').textContent=state.names[1];$('s1').textContent=state.scores[0];$('s2').textContent=state.scores[1];[0,1].forEach(team=>{const element=$(team===0?'teamA':'teamB'),active=state.team===team;element.classList.toggle('active-team',active);element.setAttribute('aria-current',String(active));element.setAttribute('aria-label',`${state.names[team]}: ${state.scores[team]} points${active?', guessing':''}`)})}
-function prepTurn(){$('turnTitle').textContent=`${state.names[state.team]}, you're up!`;go('turn')}
+function prepTurn(){$('handoff').textContent=`Pass the phone to a reader from ${state.names[1-state.team]}. They read the ${state.mode==='dinner'?'meaning':'clue'} aloud; ${state.names[state.team]} guess the saying.`;$('turnTitle').textContent=`${state.names[state.team]}, you're up!`;go('turn')}
 function setClock(left){$('clock').textContent=left;$('clock').setAttribute('aria-label',`${left} second${left===1?'':'s'} remaining`)}
 function restoreActionFocus(){if(actionFocus&&!actionFocus.disabled&&state.roundActive){const target=actionFocus;actionFocus=null;target.focus({preventScroll:true})}}
 function syncControls(){$('skipBtn').textContent=`SKIP (${state.skips})`;const blocked=!state.roundActive||state.revealing||state.actionLocked;$('correctBtn').disabled=blocked;$('skipBtn').disabled=blocked||state.skips<=0;$('revealBtn').disabled=blocked||state.skips<=0;restoreActionFocus()}
 function lockActions(){const focused=document.activeElement;actionFocus=[$('correctBtn'),$('skipBtn'),$('revealBtn')].includes(focused)?focused:null;state.actionLocked=true;clearTimeout(state.actionTimer);syncControls();state.actionTimer=setTimeout(()=>{state.actionLocked=false;syncControls()},ACTION_LOCK_MS)}
 function claimAction(){if(!state.roundActive||state.revealing||state.actionLocked)return false;if(Date.now()>=state.endsAt){endRound();return false}lockActions();return true}
 function startRound(){if(state.roundActive)return;clearInterval(state.timer);clearTimeout(state.revealTimer);clearTimeout(state.actionTimer);actionFocus=null;const token=++state.roundToken;state.roundActive=true;state.actionLocked=false;state.left=state.time;state.endsAt=Date.now()+state.time*1000;state.skips=2;state.revealing=false;setClock(state.left);prepareAudio();next(`${state.names[state.team]} round started. ${state.time} seconds. First clue: `);update();syncControls();go('game');let beeped=99;state.timer=setInterval(()=>{if(token!==state.roundToken||!state.roundActive)return;const left=Math.max(0,Math.ceil((state.endsAt-Date.now())/1000));if(left!==state.left){state.left=left;setClock(left)}if(left<=5&&left>0&&left!==beeped){beeped=left;if(left===5)announce('5 seconds remaining.');tone(300,.04)}if(left<=0)endRound()},100)}
-function next(prefix='Next clue: '){if(state.idx>=state.deck.length){state.deck=makeDeck(state.currentAnswer);state.idx=0}let c=state.deck[state.idx++];state.currentAnswer=c[1];document.querySelector('.card').dataset.mode=c[3];$('gib').textContent=c[0];$('answer').textContent=c[1];$('answer').classList.remove('show');announce(`${prefix}${c[3]}. ${c[0]}`)}
+function next(prefix='Next clue: '){if(state.idx>=state.deck.length){state.deck=makeDeck(state.currentAnswer);state.idx=0}let c=state.deck[state.idx++];state.currentAnswer=c[1];document.querySelector('.card').dataset.mode=c[3];$('cardHint').textContent=state.mode==='dinner'?'Which saying fits this meaning?':'Which familiar saying does this mean?';$('gib').textContent=c[0];$('answer').textContent=c[1];$('answer').classList.remove('show');announce(`${prefix}${c[3]}. ${c[0]}`)}
 function correct(){if(!claimAction())return;state.scores[state.team]++;update();next(`${state.names[state.team]} score ${state.scores[state.team]}. Next clue: `);tone(740,.12)}
 function useSkip(){if(state.skips<=0||!claimAction())return false;state.skips--;syncControls();return true}
 function skip(){if(!useSkip())return;next('Skipped. Next clue: ');tone(220,.05)}
 function reveal(){if(!useSkip())return;state.revealing=true;$('answer').classList.add('show');announce(`Answer: ${state.currentAnswer}`);syncControls();const token=state.roundToken;state.revealTimer=setTimeout(()=>{if(token!==state.roundToken||!state.roundActive)return;state.revealing=false;next();syncControls()},1400)}
 function endRound(){if(!state.roundActive)return;state.roundActive=false;clearInterval(state.timer);clearTimeout(state.revealTimer);clearTimeout(state.actionTimer);actionFocus=null;state.roundToken++;state.revealing=false;state.actionLocked=false;syncControls();state.turnsCompleted++;if(state.turnsCompleted%2===0&&(state.scores[0]>=state.target||state.scores[1]>=state.target)&&state.scores[0]!==state.scores[1]){const w=state.scores[0]>state.scores[1]?0:1;$('winTitle').textContent=`${state.names[w]} win!`;$('finalScore').textContent=`Final score: ${state.scores[0]}–${state.scores[1]}`;go('win');tone(180,.3);return}state.team=1-state.team;update();prepTurn();tone(180,.3)}
 function rematch(){state.scores=[0,0];state.startingTeam=1-state.startingTeam;state.team=state.startingTeam;state.turnsCompleted=0;state.deck=makeDeck();state.idx=0;update();prepTurn()}
+if(window.location?.search?.includes('deck=dinner')){const seg=$('decks');seg.onclick({target:seg.querySelector('[data-v="dinner"]')});go('setup')}
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&state.roundActive&&Date.now()>=state.endsAt)endRound()});
 </script></body></html>

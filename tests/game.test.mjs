@@ -105,6 +105,11 @@ function createFixture({ audio = "missing" } = {}) {
     "t2",
     "times",
     "targets",
+    "decks",
+    "categories",
+    "dinnerCategories",
+    "handoff",
+    "cardHint",
     "homeTitle",
     "howTitle",
     "setupTitle",
@@ -141,6 +146,8 @@ function createFixture({ audio = "missing" } = {}) {
     });
   }
 
+  makeSegment("decks", ["mixed", "SYNONYM TWIST", "MIXED MESSAGE", "dinner"], "mixed");
+  makeSegment("categories", ["All", "Easy classics", "Food & life", "Difficult delightful"], "All");
   makeSegment("times", [30, 45, 60], 30);
   makeSegment("targets", [7, 10, 15], 10);
 
@@ -167,7 +174,7 @@ function createFixture({ audio = "missing" } = {}) {
     },
     querySelectorAll(selector) {
       if (selector === ".screen") return screens;
-      if (selector === ".seg") return [elements.times, elements.targets];
+      if (selector === ".seg") return [elements.times, elements.targets, elements.decks, elements.categories];
       return [];
     },
   };
@@ -598,4 +605,30 @@ test("countdown interval renders remaining seconds and ends at zero", () => {
   assert.equal(fixture.elements.clock.textContent, 0);
   assert.equal(fixture.value("state.roundActive"), false);
   assert.equal(visibleScreen(fixture), "turn");
+});
+
+
+test("Dinner table retains 120 cards, categories, scoring and rematch selection", () => {
+  const f = createFixture();
+  assert.equal(f.value('dinnerCards.length'), 120);
+  for (const category of ['Easy classics', 'Food & life', 'Difficult delightful']) {
+    f.run(`state.mode='dinner';state.category=${JSON.stringify(category)}`);
+    assert.equal(f.value('makeDeck().length'), 40);
+    assert.ok(f.value('makeDeck().every(c=>c[3]===state.category && c[0] && c[1])'));
+  }
+  f.elements.decks.onclick({target:f.elements.decks.buttons[3]});
+  assert.equal(f.elements.dinnerCategories.hidden, false);
+  f.run('startGame();startRound();correct()');
+  assert.equal(f.value('state.mode'), 'dinner');
+  assert.equal(f.value('state.deck.length'), 120);
+  assert.deepEqual(f.value('state.scores'), [1,0]);
+  f.run('endRound()');
+  assert.match(f.elements.handoff.textContent, /Pass the phone/);
+  assert.equal(f.value('state.team'), 1);
+  f.run('rematch()');
+  assert.equal(f.value('state.deck.length'), 120);
+  for (const mode of ['SYNONYM TWIST', 'MIXED MESSAGE']) {
+    f.run(`state.mode=${JSON.stringify(mode)}`);
+    assert.ok(f.value('makeDeck().length>0 && makeDeck().every(c=>c[3]===state.mode)'));
+  }
 });

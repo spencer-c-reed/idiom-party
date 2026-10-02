@@ -2,7 +2,11 @@
 
 A phone-first, two-team party game for decoding warped familiar sayings. The
 app is deliberately small and static: `index.html` contains the interface and
-gameplay, `styles.css` contains presentation, and `cards.js` contains the deck.
+gameplay, `styles.css` contains presentation, and `cards.js` contains the decks.
+
+Choose Mixed sayings, Synonym Twists, Mixed Messages, or Dinner table. The dinner
+mode retains all 120 category cards (40 in each category), with a meaning as the
+clue and the idiom as the answer. `?deck=dinner` opens its setup directly.
 
 ## Run locally
 
@@ -37,5 +41,6 @@ npm run test:browser
 
 Run both suites with `npm run check`.
 
-Production is served from the `main` branch through GitHub Pages at
-<https://spencer-c-reed.github.io/idiom-party/>.
+Source ships through the `main` branch. Production is a static copy behind the
+private gate at <https://spencercav.com/p/idiom-party/>; GitHub Pages is disabled.
+The served copy retains the Folio tokens, masthead, and private home-link script.

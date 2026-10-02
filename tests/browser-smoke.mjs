@@ -232,13 +232,14 @@ async function clickCenter(page, selector) {
   const point = await page.evaluate(`(() => {
     const element = document.querySelector(${JSON.stringify(selector)});
     if (!element) return null;
+    element.scrollIntoView({block: 'center', behavior: 'instant'});
     const rect = element.getBoundingClientRect();
     return {
       disabled: Boolean(element.disabled),
       height: rect.height,
       width: rect.width,
-      x: rect.left + rect.width / 2,
-      y: rect.top + rect.height / 2
+      x: rect.left + rect.width / 2 - visualViewport.offsetLeft,
+      y: rect.top + rect.height / 2 - visualViewport.offsetTop
     };
   })()`);
   assert.ok(point, `Expected ${selector} to exist`);
