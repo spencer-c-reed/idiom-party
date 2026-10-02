@@ -4,6 +4,10 @@ A phone-first, two-team party game for decoding warped familiar sayings. The
 app is deliberately small and static: `index.html` contains the interface and
 gameplay, `styles.css` contains presentation, and `cards.js` contains the decks.
 
+After each turn, the handoff shows points earned and both teams’ totals. Expand
+the missed-sayings review to see skipped, revealed and timed-out answers. The
+winning turn keeps the same review; starting a new game or rematch clears it.
+
 Choose Mixed sayings, Synonym Twists, Mixed Messages, or Dinner table. The dinner
 mode retains all 120 category cards (40 in each category), with a meaning as the
 clue and the idiom as the answer. `?deck=dinner` opens its setup directly.

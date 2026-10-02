@@ -503,3 +503,11 @@ fieldset.field {
 .deck-chips { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .deck-chips button { cursor: pointer; }
 [hidden] { display: none !important; }
+
+/* The handoff keeps the last turn visible without delaying the next team. */
+.round-recap { margin: 22px 0 8px; padding: 18px; text-align: left; border: 1px solid var(--rule-strong, #ccc); border-radius: 12px; background: var(--surface, #fff); }
+.round-recap h3 { margin: 0; font: 600 18px/1.3 var(--font-sans, sans-serif); }
+.round-recap p { margin: 8px 0 0; font-size: 14px; line-height: 1.5; overflow-wrap: anywhere; }
+.round-recap summary { margin-top: 14px; padding: 10px 0; cursor: pointer; font-weight: 600; }
+.round-recap .missed-cards { white-space: pre-line; border-top: 1px solid var(--rule, #ddd); padding-top: 12px; }
+.round-recap summary:focus-visible { outline: 3px solid var(--accent, #285); outline-offset: 3px; }

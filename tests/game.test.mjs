@@ -130,6 +130,19 @@ function createFixture({ audio = "missing" } = {}) {
     "winTitle",
     "finalScore",
     "announcer",
+    "turnRecap",
+    "turnRecapTitle",
+    "turnRecapScore",
+    "turnMissed",
+    "turnMissedTitle",
+    "turnMissedCards",
+    "winRecap",
+    "winRecapTitle",
+    "winRecapScore",
+    "winMissed",
+    "winMissedTitle",
+    "winMissedCards",
+
   ];
   const elements = Object.fromEntries(ids.map((id) => [id, new Element(id)]));
   elements.t1.value = "Hot Dogs";
@@ -631,4 +644,22 @@ test("Dinner table retains 120 cards, categories, scoring and rematch selection"
     f.run(`state.mode=${JSON.stringify(mode)}`);
     assert.ok(f.value('makeDeck().length>0 && makeDeck().every(c=>c[3]===state.mode)'));
   }
+});
+
+test("expiry during a reveal retains one missed answer and resets recaps for rematch", () => {
+  const f = createFixture();
+  f.run("startGame(); state.sound=false; startRound()");
+  const answer = f.value("state.currentAnswer");
+  f.run("reveal()");
+  f.advance(30_000);
+  f.runIntervals();
+  assert.equal(f.value("state.missed.length"), 1);
+  assert.ok(f.elements.turnMissedCards.textContent.includes(answer));
+  assert.equal(f.elements.turnRecap.hidden, false);
+  assert.ok(f.elements.turnRecapScore.textContent.includes("+0 points this turn"));
+  f.run("startRound()");
+  assert.equal(f.value("state.missed.length"), 0);
+  f.run("endRound(); rematch()");
+  assert.equal(f.elements.turnRecap.hidden, true);
+  assert.equal(f.elements.winRecap.hidden, true);
 });
