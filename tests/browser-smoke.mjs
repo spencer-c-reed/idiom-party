@@ -700,7 +700,7 @@ async function run() {
     }))()`);
     assert.deepEqual(skipState, {
       correctDisabled: false,
-      revealDisabled: true,
+      revealDisabled: false,
       skipDisabled: true,
       skips: 0,
     });
@@ -731,17 +731,22 @@ async function run() {
     const revealState = await page.evaluate(`(() => ({
       answerShown: document.getElementById('answer').classList.contains('show'),
       correctDisabled: document.getElementById('correctBtn').disabled,
-      focus: document.activeElement?.id,
+      currentAnswer: state.currentAnswer,
       revealDisabled: document.getElementById('revealBtn').disabled,
       skipDisabled: document.getElementById('skipBtn').disabled
     }))()`);
     assert.deepEqual(revealState, {
-      answerShown: false,
+      answerShown: true,
       correctDisabled: false,
-      focus: "revealBtn",
-      revealDisabled: false,
+      currentAnswer: revealedAnswer,
+      revealDisabled: true,
       skipDisabled: false,
     });
+    await clickCenter(page, "#correctBtn");
+    assert.equal(
+      await page.evaluate(`document.getElementById('answer').classList.contains('show')`),
+      false,
+    );
 
     const responsiveViewports = [
       { height: 568, width: 320 },

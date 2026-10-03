@@ -8,6 +8,10 @@ After each turn, the handoff shows points earned and both teams’ totals. Expan
 the missed-sayings review to see skipped, revealed and timed-out answers. The
 winning turn keeps the same review; starting a new game or rematch clears it.
 
+During a turn, **Show answer** puts the answer on the card without moving on,
+so the reader can check a guess and then tap Got it or Skip. It costs nothing;
+a skip after a peek is logged as revealed.
+
 Choose Mixed sayings, Synonym Twists, Mixed Messages, or Dinner table. The dinner
 mode retains all 120 category cards (40 in each category), with a meaning as the
 clue and the idiom as the answer. `?deck=dinner` opens its setup directly.

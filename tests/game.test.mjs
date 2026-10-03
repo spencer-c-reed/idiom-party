@@ -493,17 +493,9 @@ test("locked actions restore keyboard focus and announce changing card content",
   fixture.advance(400);
   assert.equal(fixture.value("document.activeElement.id"), "correctBtn");
 
-  fixture.elements.revealBtn.focus();
   const answer = fixture.value("state.currentAnswer");
   fixture.run("reveal()");
   assert.equal(fixture.elements.announcer.textContent, `Answer: ${answer}`);
-  assert.equal(fixture.value("document.activeElement?.id"), undefined);
-  fixture.advance(1_400);
-  assert.equal(fixture.value("document.activeElement.id"), "revealBtn");
-  assert.match(
-    fixture.elements.announcer.textContent,
-    /^Next clue: (MIXED MESSAGE|SYNONYM TWIST)\. /,
-  );
 });
 
 test("skip and reveal controls expose every no-op state", () => {
@@ -515,22 +507,42 @@ test("skip and reveal controls expose every no-op state", () => {
 
   assert.equal(fixture.value("state.skips"), 0);
   assert.equal(fixture.elements.skipBtn.disabled, true);
-  assert.equal(fixture.elements.revealBtn.disabled, true);
+  assert.equal(fixture.elements.revealBtn.disabled, false);
   assert.equal(fixture.elements.correctBtn.disabled, false);
 
-  const revealing = createFixture();
-  revealing.run("startGame(); state.sound = false; startRound(); reveal()");
-  assert.equal(revealing.elements.answer.classList.contains("show"), true);
-  assert.equal(revealing.elements.skipBtn.disabled, true);
-  assert.equal(revealing.elements.revealBtn.disabled, true);
-  assert.equal(revealing.elements.correctBtn.disabled, true);
+  // Out of skips, the reader can still check a guess.
+  fixture.run("reveal()");
+  assert.equal(fixture.elements.answer.classList.contains("show"), true);
+});
 
-  revealing.advance(1_400);
-  assert.equal(revealing.elements.answer.classList.contains("show"), false);
-  assert.equal(revealing.value("state.skips"), 1);
-  assert.equal(revealing.elements.skipBtn.disabled, false);
-  assert.equal(revealing.elements.revealBtn.disabled, false);
-  assert.equal(revealing.elements.correctBtn.disabled, false);
+test("show answer stays up until the reader marks the guess", () => {
+  const right = createFixture();
+  right.run("startGame(); state.sound = false; startRound(); reveal()");
+  const clue = right.value("state.currentClue");
+  assert.equal(right.elements.answer.classList.contains("show"), true);
+  assert.equal(right.elements.revealBtn.disabled, true);
+  assert.equal(right.elements.revealBtn.textContent, "ANSWER SHOWN");
+  right.advance(5_000);
+  assert.equal(right.value("state.currentClue"), clue);
+  assert.equal(right.elements.answer.classList.contains("show"), true);
+  assert.equal(right.value("state.skips"), 2);
+  assert.equal(right.elements.correctBtn.disabled, false);
+  right.run("correct()");
+  assert.equal(right.value("state.scores[0]"), 1);
+  assert.equal(right.elements.answer.classList.contains("show"), false);
+  right.advance(400);
+  assert.equal(right.elements.revealBtn.disabled, false);
+  assert.equal(right.elements.revealBtn.textContent, "SHOW ANSWER");
+
+  const wrong = createFixture();
+  wrong.run("startGame(); state.sound = false; startRound(); reveal()");
+  const answer = wrong.value("state.currentAnswer");
+  wrong.advance(400);
+  wrong.run("skip()");
+  assert.equal(wrong.value("state.scores[0]"), 0);
+  assert.equal(wrong.value("state.skips"), 1);
+  assert.ok(wrong.value("state.missed[0]").startsWith("Revealed: "));
+  assert.ok(wrong.value("state.missed[0]").endsWith(answer));
 });
 
 test("audio is reused and audio failures never interrupt gameplay", () => {
