@@ -124,6 +124,7 @@ function createFixture({ audio = "missing" } = {}) {
     "skipBtn",
     "correctBtn",
     "revealBtn",
+    "undoBtn",
     "clock",
     "gib",
     "answer",
@@ -400,8 +401,8 @@ test("markup and responsive styles preserve core accessibility guarantees", () =
   );
   assert.match(stylesSource, /@media\s*\(prefers-reduced-motion:\s*reduce\)/);
   assert.match(cssRule(".pill"), /min-width:\s*44px/);
-  assert.match(cssRule(".hint"), /opacity:\s*0\.68/);
-  assert.match(cssRule(".team.active-team"), /color:\s*#a92916/);
+  assert.match(cssRule(".hint"), /color:\s*var\(--muted\)/);
+  assert.match(cssRule(".team.active-team"), /color:\s*var\(--signal\)/);
   assert.match(
     cssRule(".active-team .turn-marker"),
     /display:\s*block/,
@@ -671,4 +672,35 @@ test("expiry during a reveal retains one missed answer and resets recaps for rem
   f.run("endRound(); rematch()");
   assert.equal(f.elements.turnRecap.hidden, true);
   assert.equal(f.elements.winRecap.hidden, true);
+});
+
+
+test("undo restores a scored card, including after a deck reshuffle, without extending time", () => {
+  const f=createFixture();f.run('startGame(); startRound(); state.idx=state.deck.length-1; next();');
+  const before=f.value('({answer:state.currentAnswer,deck:state.deck,idx:state.idx,endsAt:state.endsAt})');
+  f.run('correct()');f.advance(400);f.elements.undoBtn.focus();f.run('undoMark(); undoMark()');
+  assert.equal(f.value('state.scores[0]'),0);
+  assert.equal(f.value('state.currentAnswer'),before.answer);
+  assert.deepEqual(f.value('state.deck'),before.deck);
+  assert.equal(f.value('state.idx'),before.idx);
+  assert.equal(f.value('state.endsAt'),before.endsAt);
+  assert.equal(f.value('lastMark'),null);f.advance(400);assert.equal(f.elements.undoBtn.disabled,true);assert.equal(f.elements.correctBtn.ownerDocument.activeElement,f.elements.correctBtn);
+});
+
+test("undo restores the last skip, revealed answer and missed review exactly", () => {
+  const f=createFixture();f.run('startGame(); startRound(); reveal()');f.advance(400);
+  const answer=f.value('state.currentAnswer');f.run('skip()');f.advance(400);f.run('undoMark()');
+  assert.equal(f.value('state.skips'),2);assert.equal(f.value('state.missed.length'),0);
+  assert.equal(f.value('state.currentAnswer'),answer);assert.equal(f.value('state.answerShown'),true);
+  assert.equal(f.elements.answer.classList.contains('show'),true);
+  f.advance(400);f.run('correct()');f.advance(400);f.run('skip()');f.advance(400);f.run('undoMark()');
+  assert.equal(f.value('state.scores[0]'),1);assert.equal(f.value('state.skips'),2);
+});
+
+test("undo cannot cross a deadline or leak into a new turn or rematch", () => {
+  const f=createFixture();f.run('startGame(); startRound(); correct()');f.advance(30_000);
+  f.run('undoMark()');assert.equal(f.value('state.roundActive'),false);
+  assert.equal(f.value('state.scores[0]'),1);assert.equal(f.value('lastMark'),null);
+  f.run('startRound()');assert.equal(f.elements.undoBtn.disabled,true);
+  f.run('endRound(); rematch()');assert.equal(f.value('lastMark'),null);
 });

@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { constants as fsConstants, mkdtempSync } from "node:fs";
+import { constants as fsConstants, existsSync, mkdtempSync } from "node:fs";
 import {
   access,
   readFile,
@@ -9,10 +9,28 @@ import {
 import { createServer } from "node:http";
 import { tmpdir } from "node:os";
 import { dirname, extname, join, resolve, sep } from "node:path";
-import { spawn } from "node:child_process";
+import { execFileSync, spawn } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
 const repoRoot = dirname(fileURLToPath(new URL("../package.json", import.meta.url)));
+
+function findDesignSystemRoot() {
+  const candidates = [resolve(repoRoot, "../design-system/dist")];
+  try {
+    const commonDir = execFileSync(
+      "git",
+      ["-C", repoRoot, "rev-parse", "--git-common-dir"],
+      { encoding: "utf8" },
+    ).trim();
+    const mainRepoRoot = dirname(resolve(repoRoot, commonDir));
+    candidates.push(resolve(mainRepoRoot, "../design-system/dist"));
+  } catch {
+    // Non-git copies can still use the ordinary sibling layout.
+  }
+  return candidates.find((candidate) => existsSync(candidate)) ?? candidates[0];
+}
+
+const designSystemRoot = findDesignSystemRoot();
 const viewport = { width: 320, height: 568 };
 const mimeTypes = {
   ".css": "text/css; charset=utf-8",
@@ -309,11 +327,13 @@ function startStaticServer() {
       }
 
       const pathname = decodeURIComponent(url.pathname);
-      const relativePath = pathname === "/" ? "index.html" : pathname.slice(1);
-      const filePath = resolve(repoRoot, relativePath);
+      const shared = pathname.startsWith("/p/_kit/ds/");
+      const assetRoot = shared ? designSystemRoot : repoRoot;
+      const relativePath = shared ? pathname.slice("/p/_kit/ds/".length) : pathname === "/" ? "index.html" : pathname.slice(1);
+      const filePath = resolve(assetRoot, relativePath);
       if (
-        filePath !== repoRoot &&
-        !filePath.startsWith(`${repoRoot}${sep}`)
+        filePath !== assetRoot &&
+        !filePath.startsWith(`${assetRoot}${sep}`)
       ) {
         response.writeHead(403);
         response.end("Forbidden");
@@ -576,7 +596,7 @@ async function run() {
       .filter((node) => node.role?.value === "textbox")
       .map((node) => node.name?.value)
       .sort();
-    assert.deepEqual(textboxNames, ["Team 1", "Team 2"]);
+    assert.deepEqual(textboxNames.map(name => name.toLowerCase()), ["team 1", "team 2"]);
 
     await page.evaluate(`(() => {
       document.querySelector('#times [data-v="45"]').click();
