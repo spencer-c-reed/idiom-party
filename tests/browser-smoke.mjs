@@ -211,6 +211,15 @@ async function fetchJsonWithTimeout(url, options = {}, timeoutMs = 15_000) {
   }
 }
 
+async function waitFor(page, expression, timeoutMs = 2_000) {
+  const deadline = Date.now() + timeoutMs;
+  while (Date.now() < deadline) {
+    if (await page.evaluate(expression)) return;
+    await new Promise((resolvePromise) => setTimeout(resolvePromise, 25));
+  }
+  throw new Error(`Timed out waiting for ${expression}`);
+}
+
 async function clickPoint(page, point) {
   await page.send("Input.dispatchMouseEvent", {
     button: "left",
@@ -648,13 +657,9 @@ async function run() {
       await page.evaluate(`document.getElementById('announcer').textContent`),
       /^ABCDEFGHIJKLMNOPQR score 1\. Next clue: (MIXED MESSAGE|SYNONYM TWIST)\. /,
     );
-    await page.evaluate(
-      `new Promise((resolvePromise) => setTimeout(resolvePromise, 450))`,
-    );
-    assert.equal(
-      await page.evaluate(`document.activeElement?.id`),
-      "correctBtn",
-      "keyboard focus should return after the action lock",
+    await waitFor(
+      page,
+      `state.actionLocked === false && document.activeElement?.id === "correctBtn"`,
     );
 
     const scoreBeforeExpiry = await page.evaluate(`(() => {
@@ -664,8 +669,9 @@ async function run() {
       return state.scores[0];
     })()`);
     await clickCenter(page, "#correctBtn");
-    await page.evaluate(
-      `new Promise((resolvePromise) => setTimeout(resolvePromise, 0))`,
+    await waitFor(
+      page,
+      `document.querySelector('.screen.active')?.id === "turn" && document.activeElement?.id === "turnTitle"`,
     );
     const expired = await page.evaluate(`(() => ({
       active: document.querySelector('.screen.active')?.id,
@@ -684,14 +690,12 @@ async function run() {
       await page.evaluate(`document.getElementById('announcer').textContent`),
       /^Skipped\. Next clue: (MIXED MESSAGE|SYNONYM TWIST)\. /,
     );
-    await page.evaluate(
-      `new Promise((resolvePromise) => setTimeout(resolvePromise, 450))`,
+    await waitFor(
+      page,
+      `state.actionLocked === false && document.activeElement?.id === "skipBtn"`,
     );
-    assert.equal(await page.evaluate(`document.activeElement?.id`), "skipBtn");
     await clickCenter(page, "#skipBtn");
-    await page.evaluate(
-      `new Promise((resolvePromise) => setTimeout(resolvePromise, 450))`,
-    );
+    await waitFor(page, `state.actionLocked === false`);
     const skipState = await page.evaluate(`(() => ({
       correctDisabled: document.getElementById('correctBtn').disabled,
       revealDisabled: document.getElementById('revealBtn').disabled,
@@ -725,9 +729,7 @@ async function run() {
       revealDisabled: true,
       skipDisabled: true,
     });
-    await page.evaluate(
-      `new Promise((resolvePromise) => setTimeout(resolvePromise, 1450))`,
-    );
+    await waitFor(page, `state.actionLocked === false`);
     const revealState = await page.evaluate(`(() => ({
       answerShown: document.getElementById('answer').classList.contains('show'),
       correctDisabled: document.getElementById('correctBtn').disabled,

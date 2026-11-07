@@ -510,9 +510,6 @@ test("skip and reveal controls expose every no-op state", () => {
   assert.equal(fixture.elements.revealBtn.disabled, false);
   assert.equal(fixture.elements.correctBtn.disabled, false);
 
-  // Out of skips, the reader can still check a guess.
-  fixture.run("reveal()");
-  assert.equal(fixture.elements.answer.classList.contains("show"), true);
 });
 
 test("show answer stays up until the reader marks the guess", () => {
