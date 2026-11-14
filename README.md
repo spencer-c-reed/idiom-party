@@ -8,6 +8,10 @@ After each turn, the handoff shows points earned and both teams’ totals. Expan
 the missed-sayings review to see skipped, revealed and timed-out answers. The
 winning turn keeps the same review; starting a new game or rematch clears it.
 
+During a turn, **Undo Got it** or **Undo Skip** restores the previous card and
+its score, skips and missed-answer review. Only the last mark can be undone,
+and the timer keeps its original deadline. Undo ends with the turn.
+
 During a turn, **Show answer** puts the answer on the card without moving on,
 so the reader can check a guess and then tap Got it or Skip. It costs nothing;
 a skip after a peek is logged as revealed.
@@ -18,13 +22,9 @@ clue and the idiom as the answer. `?deck=dinner` opens its setup directly.
 
 ## Run locally
 
-Serve the repository root with any static server, for example:
-
-```sh
-python3 -m http.server 4173
-```
-
-Then open <http://localhost:4173>.
+The game uses the private hub’s shared Folio tokens at `/p/_kit/ds/`.
+A local server must mount `../design-system/dist` at that path as well as
+serve this repository. The browser smoke server does both automatically.
 
 ## Validate
 

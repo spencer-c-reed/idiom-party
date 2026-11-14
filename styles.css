@@ -1,7 +1,9 @@
+/* Folio v2 (light only): tokens from /p/_kit/ds/tokens.css. The game keeps its chunky offset-shadow buttons; colour, type and spacing come from the tokens. */
 :root {
-  color: #251b18;
-  background: #fff8e8;
-  font-family: Inter, ui-rounded, "SF Pro Rounded", system-ui, sans-serif;
+  --yellow: color-mix(in srgb, var(--series-4) 72%, var(--paper));
+  color: var(--ink);
+  background: var(--paper);
+  font-family: var(--font-sans);
   font-synthesis: none;
 }
 
@@ -14,8 +16,8 @@ body {
   margin: 0;
   overflow-x: hidden;
   background:
-    radial-gradient(circle at 20% 0, #ffd65a 0, transparent 34%),
-    linear-gradient(160deg, #fff7df, #ffdfd3);
+    radial-gradient(circle at 20% 0, color-mix(in srgb, var(--series-4) 30%, var(--paper)) 0, transparent 34%),
+    linear-gradient(160deg, var(--paper), var(--signal-wash));
 }
 
 button,
@@ -32,7 +34,7 @@ button {
   flex-direction: column;
   width: 100%;
   max-width: 540px;
-  min-height: 100dvh;
+  min-height: calc(100dvh - 52px);
   margin: auto;
   padding:
     max(18px, env(safe-area-inset-top))
@@ -50,9 +52,8 @@ button {
 
 .brand {
   min-width: 0;
-  font-size: 23px;
-  font-weight: 1000;
-  letter-spacing: -1.2px;
+  font: 500 var(--text-xs)/1.3 var(--font-mono);
+  letter-spacing: var(--tracking-label);
 }
 
 .pill {
@@ -61,10 +62,10 @@ button {
   min-height: 44px;
   padding: 8px 12px;
   cursor: pointer;
-  background: #fff;
-  border: 2px solid #251b18;
+  background: var(--surface);
+  border: 2px solid var(--ink);
   border-radius: 999px;
-  box-shadow: 2px 3px 0 #251b18;
+  box-shadow: 2px 3px 0 var(--ink);
   font-weight: 900;
   place-items: center;
 }
@@ -99,30 +100,29 @@ button {
 
 h1 {
   margin: 12px 0;
-  color: #ec3f25;
-  font-size: 48px;
-  letter-spacing: -3px;
-  line-height: 0.9;
+  color: var(--signal);
+  font: 500 56px/0.98 var(--font-serif);
+  font-variation-settings: "opsz" 72;
+  letter-spacing: -0.03em;
 }
 
 h2 {
   margin: 22px 0 8px;
-  font-size: 32px;
-  letter-spacing: -1.5px;
+  font: 500 34px/1.05 var(--font-serif);
+  letter-spacing: -0.025em;
 }
 
 [data-screen-title]:focus-visible,
 button:focus-visible,
 input:focus-visible {
-  outline: 4px solid #075cca;
+  outline: 4px solid var(--accent);
   outline-offset: 3px;
 }
 
 .sub {
-  opacity: 0.76;
-  font-size: 18px;
-  font-weight: 650;
-  line-height: 1.4;
+  font: 400 var(--text-lg)/1.45 var(--font-serif);
+  color: var(--ink-2);
+  opacity: 1;
 }
 
 .btn {
@@ -130,38 +130,38 @@ input:focus-visible {
   margin-top: 12px;
   padding: 17px 16px;
   cursor: pointer;
-  background: #fff;
-  border: 3px solid #251b18;
-  border-radius: 18px;
-  box-shadow: 4px 5px 0 #251b18;
-  font-size: 19px;
-  font-weight: 1000;
+  background: var(--surface);
+  border: 2px solid var(--ink);
+  border-radius: var(--radius-lg);
+  box-shadow: 3px 4px 0 var(--ink);
+  font: 600 var(--text-base)/1.2 var(--font-sans);
+  letter-spacing: 0.06em;
   transition: 80ms;
 }
 
 .btn:active {
-  box-shadow: 1px 1px 0 #251b18;
+  box-shadow: 0 0 0 var(--ink);
   transform: translate(3px, 4px);
 }
 
 .btn:disabled {
   cursor: not-allowed;
   opacity: 0.55;
-  box-shadow: 1px 1px 0 #251b18;
+  box-shadow: 1px 1px 0 var(--ink);
   transform: none;
 }
 
 .primary {
   color: #fff;
-  background: #ff5c35;
+  background: var(--accent);
 }
 
 .yellow {
-  background: #ffd34e;
+  background: var(--yellow);
 }
 
 .ghost {
-  background: rgb(255 255 255 / 55%);
+  background: color-mix(in srgb, var(--surface) 60%, transparent);
 }
 
 .setup {
@@ -184,17 +184,19 @@ fieldset.field {
   display: block;
   margin-bottom: 8px;
   padding: 0;
-  font-weight: 950;
+  font: 500 var(--text-2xs)/1.3 var(--font-mono);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--muted);
 }
 
 .field input {
   width: 100%;
   padding: 14px;
-  background: #fff;
-  border: 3px solid #251b18;
-  border-radius: 14px;
-  font-size: 18px;
-  font-weight: 800;
+  background: var(--surface);
+  border: 2px solid var(--ink);
+  border-radius: var(--radius);
+  font: 500 var(--text-lg)/1.3 var(--font-sans);
 }
 
 .seg {
@@ -207,15 +209,15 @@ fieldset.field {
   min-width: 0;
   min-height: 44px;
   padding: 12px 5px;
-  background: #fff;
-  border: 2px solid #251b18;
-  border-radius: 12px;
-  font-weight: 900;
+  background: var(--surface);
+  border: 2px solid var(--ink);
+  border-radius: var(--radius);
+  font: 600 var(--text-base)/1.2 var(--font-sans);
 }
 
 .seg button.on {
-  background: #ffd34e;
-  box-shadow: 2px 3px 0 #251b18;
+  background: var(--yellow);
+  box-shadow: 2px 2px 0 var(--ink);
 }
 
 .scorebar {
@@ -236,23 +238,24 @@ fieldset.field {
   min-width: 0;
   overflow-wrap: anywhere;
   text-align: center;
-  font-weight: 950;
+  font: 600 var(--text-sm)/1.3 var(--font-sans);
 }
 
 .team.active-team {
-  color: #a92916;
+  color: var(--signal);
 }
 
 .score {
   display: block;
-  font-size: 30px;
+  font: 600 32px/1.1 var(--font-sans);
+  font-variant-numeric: tabular-nums;
 }
 
 .turn-marker {
   display: none;
   margin-top: 2px;
-  font-size: 11px;
-  letter-spacing: 0.7px;
+  font: 500 var(--text-2xs)/1.3 var(--font-mono);
+  letter-spacing: var(--tracking-label);
 }
 
 .active-team .turn-marker {
@@ -263,12 +266,12 @@ fieldset.field {
   display: grid;
   width: 68px;
   height: 68px;
-  background: #fff;
-  border: 4px solid #251b18;
+  background: var(--surface);
+  border: 3px solid var(--ink);
   border-radius: 50%;
-  box-shadow: 3px 4px 0 #251b18;
-  font-size: 25px;
-  font-weight: 1000;
+  box-shadow: 3px 4px 0 var(--ink);
+  font: 600 26px/1 var(--font-sans);
+  font-variant-numeric: tabular-nums;
   place-items: center;
 }
 
@@ -279,13 +282,13 @@ fieldset.field {
   justify-content: center;
   min-height: 330px;
   margin: auto 0;
-  padding: 25px 22px;
+  padding: 56px 22px 25px;
   overflow: hidden;
   text-align: center;
-  background: #fff;
-  border: 4px solid #251b18;
-  border-radius: 26px;
-  box-shadow: 7px 8px 0 #251b18;
+  background: var(--surface);
+  border: 2px solid var(--ink);
+  border-radius: var(--radius-lg);
+  box-shadow: 5px 6px 0 var(--ink);
 }
 
 .card::before {
@@ -293,36 +296,35 @@ fieldset.field {
   inset: 0 0 auto;
   padding: 10px;
   content: attr(data-mode);
-  background: #ffd34e;
-  border-bottom: 3px solid #251b18;
-  font-size: 13px;
-  font-weight: 1000;
-  letter-spacing: 1.5px;
+  background: var(--yellow);
+  border-bottom: 2px solid var(--ink);
+  font: 500 var(--text-2xs)/1.3 var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-label);
 }
 
 .gib {
-  font-size: 35px;
-  font-weight: 1000;
-  letter-spacing: -1px;
-  line-height: 1.08;
-  text-transform: uppercase;
+  font: 500 32px/1.1 var(--font-serif);
+  font-variation-settings: "opsz" 72;
+  letter-spacing: -0.02em;
 }
 
 .hint {
   margin-top: 18px;
-  opacity: 0.68;
-  font-size: 14px;
-  font-weight: 850;
+  color: var(--muted);
+  font: 500 var(--text-2xs)/1.4 var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-label);
 }
 
 .answer {
   display: none;
   margin-top: 24px;
   padding-top: 20px;
-  color: #ec3f25;
-  border-top: 3px dashed #e6b9aa;
-  font-size: 25px;
-  font-weight: 1000;
+  color: var(--signal);
+  border-top: 1px dashed var(--rule-strong);
+  font: 500 28px/1.15 var(--font-serif);
+  letter-spacing: -0.015em;
 }
 
 .answer.show {
@@ -342,15 +344,14 @@ fieldset.field {
 
 .reveal-btn {
   padding: 10px;
-  font-size: 14px;
+  font-size: var(--text-xs);
 }
 
 .tiny {
   margin-top: 13px;
-  opacity: 0.72;
+  color: var(--muted);
   text-align: center;
-  font-size: 13px;
-  font-weight: 750;
+  font: 400 var(--text-xs)/1.4 var(--font-sans);
 }
 
 .winner {
@@ -373,15 +374,14 @@ fieldset.field {
   margin: 20px 0;
   padding: 18px;
   text-align: left;
-  background: #fff;
-  border: 3px solid #251b18;
-  border-radius: 20px;
+  background: var(--surface);
+  border: 2px solid var(--ink);
+  border-radius: var(--radius-lg);
 }
 
 .rules li {
   margin: 10px 0;
-  font-weight: 700;
-  line-height: 1.3;
+  font: 400 var(--text-base)/1.4 var(--font-sans);
 }
 
 .sr-only {
@@ -411,11 +411,11 @@ fieldset.field {
   }
 
   .gib {
-    font-size: 30px;
+    font-size: 28px;
   }
 
   h1 {
-    font-size: 42px;
+    font-size: 44px;
   }
 
   .burst {
@@ -425,7 +425,7 @@ fieldset.field {
 
 @media (max-width: 360px) {
   .brand {
-    font-size: 17px;
+    font-size: 11px;
   }
 }
 
@@ -437,10 +437,6 @@ fieldset.field {
 
   .top {
     min-height: 44px;
-  }
-
-  .brand {
-    font-size: 17px;
   }
 
   .pill {
@@ -458,7 +454,7 @@ fieldset.field {
   }
 
   .score {
-    font-size: 23px;
+    font-size: 24px;
   }
 
   .card {
@@ -468,7 +464,7 @@ fieldset.field {
   }
 
   .gib {
-    font-size: 24px;
+    font-size: 26px;
   }
 
   .hint {
@@ -478,7 +474,7 @@ fieldset.field {
   .answer {
     margin-top: 10px;
     padding-top: 9px;
-    font-size: 20px;
+    font-size: 22px;
   }
 
   .controls {
@@ -498,6 +494,20 @@ fieldset.field {
   }
 }
 
+/* Masthead (rules copied from the shared shell) */
+.ds-mast { display: flex; align-items: center; gap: var(--s-4); min-height: 52px; padding: 0 var(--gutter); border-bottom: 1px solid var(--rule); background: var(--paper); }
+.ds-mark { font: italic 600 1.3rem/1 var(--font-serif); letter-spacing: -0.01em; color: var(--ink); text-decoration: none; }
+.ds-mark:hover { color: var(--accent); }
+.ds-crumbs { display: flex; align-items: center; gap: var(--s-2); min-width: 0; flex: 1; font: 500 var(--text-2xs)/1 var(--font-mono); text-transform: uppercase; letter-spacing: var(--tracking-label); color: var(--muted); }
+.ds-crumbs > * { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ds-crumbs > * + *::before { content: "/"; margin-right: var(--s-2); color: var(--rule-strong); }
+.ds-crumbs a { color: var(--muted); text-decoration: none; }
+.ds-crumbs a:hover { color: var(--ink); }
+.ds-mast-end { display: flex; gap: var(--s-4); font: 500 var(--text-2xs)/1 var(--font-mono); text-transform: uppercase; letter-spacing: var(--tracking-label); }
+.ds-mast-end a { color: var(--ink-2); text-decoration: none; padding: var(--s-3) 0; }
+.ds-mast-end a:hover { color: var(--accent); }
+@media (max-width: 560px) { .ds-mast-end .optional { display: none; } }
+
 /* Deck choices extend the existing setup controls. */
 :root { color-scheme: light; }
 .deck-chips { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -511,3 +521,6 @@ fieldset.field {
 .round-recap summary { margin-top: 14px; padding: 10px 0; cursor: pointer; font-weight: 600; }
 .round-recap .missed-cards { white-space: pre-line; border-top: 1px solid var(--rule, #ddd); padding-top: 12px; }
 .round-recap summary:focus-visible { outline: 3px solid var(--accent, #285); outline-offset: 3px; }
+
+.secondary-controls { grid-template-columns: 1fr 1fr; margin-top: 8px; }
+.secondary-controls .btn { min-height: 44px; padding: 10px 4px; font-size: 12px; }
